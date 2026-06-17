@@ -258,7 +258,7 @@ describe('ProtectedRoute', () => {
     expect(screen.getByText('Login Page')).toBeInTheDocument()
   })
 
-  test('allows authenticated users to access protected routes', () => {
+  test('allows authenticated users to access protected routes', async () => {
     renderWithRouter(
       <Routes>
         <Route element={<ProtectedRoute />}>
@@ -273,7 +273,9 @@ describe('ProtectedRoute', () => {
       }
     )
 
-    expect(screen.getByRole('heading', { name: /dashboard/i })).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: /dashboard/i })).toBeInTheDocument()
+    })
   })
 })
 

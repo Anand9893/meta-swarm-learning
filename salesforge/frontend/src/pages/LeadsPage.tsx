@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useLeads, useCreateLead } from '../api/leads'
 import LeadCard from '../components/leads/LeadCard'
 import LeadForm from '../components/leads/LeadForm'
-import type { LeadCreate } from '../types/lead'
+import type { LeadCreate, LeadUpdate } from '../types/lead'
 
 export default function LeadsPage() {
   const [searchInput, setSearchInput] = useState('')
@@ -22,10 +22,10 @@ export default function LeadsPage() {
 
   const totalPages = data ? Math.ceil(data.total / data.limit) : 0
 
-  async function handleCreate(formData: LeadCreate) {
+  async function handleCreate(formData: LeadCreate | LeadUpdate) {
     setCreateError(null)
     try {
-      await createLead.mutateAsync(formData)
+      await createLead.mutateAsync(formData as LeadCreate)
       setShowForm(false)
     } catch {
       setCreateError('Failed to create lead. Please try again.')
