@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+.env
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node.js / React
+node_modules/
+.next/
+dist/
+build/
+.env.local
+.env.*.local
+
+# General
+.DS_Store
+*.log
+*.tmp
+.metaswarm/external-tools.yaml
