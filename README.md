@@ -6,6 +6,29 @@ A learning project exploring [metaswarm](https://github.com/dsifry/metaswarm) �
 
 A full-stack CRM application used as the development substrate for experimenting with metaswarm's agent workflows and quality gates.
 
+### Screenshots
+
+#### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+#### Leads
+![Leads List](screenshots/leads-list.png)
+
+#### New Lead Form
+![New Lead Form](screenshots/leads-new-form.png)
+
+#### Deals — List View
+![Deals List](screenshots/deals-list.png)
+
+#### Deals — Kanban Board
+![Deals Kanban](screenshots/deals-kanban.png)
+
+#### Activities
+![Activities](screenshots/activities.png)
+
+#### Companies
+![Companies](screenshots/companies.png)
+
 ### Tech Stack
 
 | Layer | Stack |
@@ -79,29 +102,6 @@ npm run test                    # run tests
 npm run test:coverage           # with coverage
 npm run lint                    # lint
 ```
-
-## Screenshots
-
-### Dashboard
-![Dashboard](screenshots/dashboard.png)
-
-### Leads
-![Leads List](screenshots/leads-list.png)
-
-### New Lead Form
-![New Lead Form](screenshots/leads-new-form.png)
-
-### Deals — List View
-![Deals List](screenshots/deals-list.png)
-
-### Deals — Kanban Board
-![Deals Kanban](screenshots/deals-kanban.png)
-
-### Activities
-![Activities](screenshots/activities.png)
-
-### Companies
-![Companies](screenshots/companies.png)
 
 ## metaswarm Workflow
 
