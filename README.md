@@ -80,6 +80,29 @@ npm run test:coverage           # with coverage
 npm run lint                    # lint
 ```
 
+## Screenshots
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### Leads
+![Leads List](screenshots/leads-list.png)
+
+### New Lead Form
+![New Lead Form](screenshots/leads-new-form.png)
+
+### Deals — List View
+![Deals List](screenshots/deals-list.png)
+
+### Deals — Kanban Board
+![Deals Kanban](screenshots/deals-kanban.png)
+
+### Activities
+![Activities](screenshots/activities.png)
+
+### Companies
+![Companies](screenshots/companies.png)
+
 ## metaswarm Workflow
 
 This project is configured with metaswarm for multi-agent orchestration. The key commands:
