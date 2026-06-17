@@ -1,5 +1,7 @@
-from fastapi import APIRouter, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.api.v1.router import router as api_v1_router
 
 app = FastAPI(
     title="SalesForge API",
@@ -15,12 +17,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Placeholder router for /api/v1 — populated in WU-03+
-api_v1_router = APIRouter()
 app.include_router(api_v1_router, prefix="/api/v1")
 
 
 @app.get("/")
 def health_check() -> dict[str, str]:
-    """Health check endpoint."""
     return {"status": "ok", "service": "salesforge-api"}
