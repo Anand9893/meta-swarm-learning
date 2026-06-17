@@ -1,8 +1,6 @@
 """TDD tests for WU-12: Deals Backend."""
 from __future__ import annotations
 
-import pytest
-
 DEALS_URL = "/api/v1/deals"
 REGISTER_URL = "/api/v1/auth/register"
 LOGIN_URL = "/api/v1/auth/login"
@@ -222,7 +220,9 @@ class TestUpdateDeal:
         tok = _register_login(client, _REP_A)
         did = _create_deal(client, _auth(tok), stage="prospect").json()["id"]
 
-        resp = client.patch(f"{DEALS_URL}/{did}", json={"stage": "proposal"}, headers=_auth(tok))
+        resp = client.patch(
+            f"{DEALS_URL}/{did}", json={"stage": "proposal"}, headers=_auth(tok)
+        )
         assert resp.status_code == 200
         assert resp.json()["stage"] == "proposal"
         assert resp.json()["probability"] == 30
@@ -244,7 +244,9 @@ class TestUpdateDeal:
         tok_b = _register_login(client, _REP_B)
         did = _create_deal(client, _auth(tok_a)).json()["id"]
 
-        resp = client.patch(f"{DEALS_URL}/{did}", json={"title": "Hijacked"}, headers=_auth(tok_b))
+        resp = client.patch(
+            f"{DEALS_URL}/{did}", json={"title": "Hijacked"}, headers=_auth(tok_b)
+        )
         assert resp.status_code == 403
 
     def test_manager_can_update_any_deal(self, client, db):
@@ -253,13 +255,17 @@ class TestUpdateDeal:
         _set_role(db, _MANAGER["email"], "manager")
         did = _create_deal(client, _auth(tok_a)).json()["id"]
 
-        resp = client.patch(f"{DEALS_URL}/{did}", json={"title": "Mgr Updated"}, headers=_auth(tok_mgr))
+        resp = client.patch(
+            f"{DEALS_URL}/{did}", json={"title": "Mgr Updated"}, headers=_auth(tok_mgr)
+        )
         assert resp.status_code == 200
         assert resp.json()["title"] == "Mgr Updated"
 
     def test_update_nonexistent_deal_returns_404(self, client, db):
         tok = _register_login(client, _REP_A)
-        resp = client.patch(f"{DEALS_URL}/nonexistent", json={"title": "X"}, headers=_auth(tok))
+        resp = client.patch(
+            f"{DEALS_URL}/nonexistent", json={"title": "X"}, headers=_auth(tok)
+        )
         assert resp.status_code == 404
 
 

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from fastapi import HTTPException, status
-from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.core.deps import require_owner_or_above

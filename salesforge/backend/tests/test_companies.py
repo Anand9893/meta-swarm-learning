@@ -1,8 +1,6 @@
 """TDD tests for WU-10: Companies Backend."""
 from __future__ import annotations
 
-import pytest
-
 COMPANIES_URL = "/api/v1/companies"
 REGISTER_URL = "/api/v1/auth/register"
 LOGIN_URL = "/api/v1/auth/login"
@@ -287,7 +285,9 @@ class TestDeleteCompany:
         cid = _create_company(client, _auth(tok)).json()["id"]
 
         user = db.query(User).filter(User.email == _REP_A["email"]).first()
-        contact = Contact(first_name="Bob", last_name="Jones", company_id=cid, owner_id=user.id)
+        contact = Contact(
+            first_name="Bob", last_name="Jones", company_id=cid, owner_id=user.id
+        )
         db.add(contact)
         db.commit()
         contact_id = contact.id
@@ -306,7 +306,10 @@ class TestDeleteCompany:
         cid = _create_company(client, _auth(tok)).json()["id"]
 
         user = db.query(User).filter(User.email == _REP_A["email"]).first()
-        deal = Deal(title="Test Deal", stage="prospect", probability=10, company_id=cid, owner_id=user.id)
+        deal = Deal(
+            title="Test Deal", stage="prospect", probability=10,
+            company_id=cid, owner_id=user.id,
+        )
         db.add(deal)
         db.commit()
         deal_id = deal.id

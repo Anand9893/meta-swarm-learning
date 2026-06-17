@@ -1,9 +1,7 @@
 """TDD tests for WU-16: Dashboard Backend."""
 from __future__ import annotations
 
-from datetime import datetime, timezone, timedelta
-
-import pytest
+from datetime import UTC, datetime, timedelta
 
 DASHBOARD_URL = "/api/v1/dashboard"
 REGISTER_URL = "/api/v1/auth/register"
@@ -36,7 +34,7 @@ def _auth(token: str) -> dict:
 
 def _seed_lead(db, owner_id: str, days_ago: int = 0):
     from app.models.lead import Lead
-    created = datetime.now(timezone.utc) - timedelta(days=days_ago)
+    created = datetime.now(UTC) - timedelta(days=days_ago)
     lead = Lead(
         first_name="Test",
         last_name="Lead",
@@ -49,9 +47,15 @@ def _seed_lead(db, owner_id: str, days_ago: int = 0):
     return lead
 
 
-def _seed_deal(db, owner_id: str, stage: str = "prospect", value: float = 1000.0, days_since_update: int = 0):
+def _seed_deal(
+    db,
+    owner_id: str,
+    stage: str = "prospect",
+    value: float = 1000.0,
+    days_since_update: int = 0,
+):
     from app.models.deal import Deal
-    updated = datetime.now(timezone.utc) - timedelta(days=days_since_update)
+    updated = datetime.now(UTC) - timedelta(days=days_since_update)
     deal = Deal(
         title="Test Deal",
         stage=stage,
@@ -67,7 +71,7 @@ def _seed_deal(db, owner_id: str, stage: str = "prospect", value: float = 1000.0
 
 def _seed_activity(db, owner_id: str, completed: bool = False, due_days_ago: int = 0):
     from app.models.activity import Activity
-    due = datetime.now(timezone.utc) - timedelta(days=due_days_ago)
+    due = datetime.now(UTC) - timedelta(days=due_days_ago)
     act = Activity(
         type="call",
         title="Test Act",
@@ -126,7 +130,7 @@ class TestDashboardStats:
         tok = _register_login(client, _REP_A)
         user = _get_user(db, _REP_A["email"])
         _seed_deal(db, user.id, stage="won", value=999.0, days_since_update=0)
-        _seed_deal(db, user.id, stage="won", value=1.0, days_since_update=35)  # last month
+        _seed_deal(db, user.id, stage="won", value=1.0, days_since_update=35)  # old
 
         resp = client.get(f"{DASHBOARD_URL}/stats", headers=_auth(tok))
         data = resp.json()
@@ -137,7 +141,7 @@ class TestDashboardStats:
         tok = _register_login(client, _REP_A)
         user = _get_user(db, _REP_A["email"])
         _seed_activity(db, user.id, completed=False, due_days_ago=2)
-        _seed_activity(db, user.id, completed=True, due_days_ago=2)  # completed, not overdue
+        _seed_activity(db, user.id, completed=True, due_days_ago=2)  # done, not overdue
         _seed_activity(db, user.id, completed=False)  # no due date, not overdue
 
         resp = client.get(f"{DASHBOARD_URL}/stats", headers=_auth(tok))
@@ -145,7 +149,7 @@ class TestDashboardStats:
 
     def test_rep_sees_only_own_stats(self, client, db):
         tok_a = _register_login(client, _REP_A)
-        tok_b = _register_login(client, _REP_B)
+        _register_login(client, _REP_B)
         user_a = _get_user(db, _REP_A["email"])
         user_b = _get_user(db, _REP_B["email"])
 
@@ -156,7 +160,7 @@ class TestDashboardStats:
         assert resp.json()["leads_this_week"] == 1
 
     def test_manager_sees_all_stats(self, client, db):
-        tok_a = _register_login(client, _REP_A)
+        _register_login(client, _REP_A)
         tok_mgr = _register_login(client, _MANAGER)
         _set_role(db, _MANAGER["email"], "manager")
         user_a = _get_user(db, _REP_A["email"])
@@ -201,7 +205,7 @@ class TestPipelineByStage:
 
     def test_rep_scoped_pipeline(self, client, db):
         tok_a = _register_login(client, _REP_A)
-        tok_b = _register_login(client, _REP_B)
+        _register_login(client, _REP_B)
         user_a = _get_user(db, _REP_A["email"])
         user_b = _get_user(db, _REP_B["email"])
         _seed_deal(db, user_a.id, stage="won", value=1000.0)
@@ -234,9 +238,9 @@ class TestRecentActivities:
         user = _get_user(db, _REP_A["email"])
 
         older = Activity(type="call", title="Older", owner_id=user.id,
-                         created_at=datetime.now(timezone.utc) - timedelta(hours=2))
+                         created_at=datetime.now(UTC) - timedelta(hours=2))
         newer = Activity(type="email", title="Newer", owner_id=user.id,
-                         created_at=datetime.now(timezone.utc))
+                         created_at=datetime.now(UTC))
         db.add_all([older, newer])
         db.commit()
 
@@ -251,11 +255,15 @@ class TestRecentActivities:
         tok = _register_login(client, _REP_A)
         user = _get_user(db, _REP_A["email"])
 
-        deal = Deal(title="Alpha Deal", stage="prospect", probability=10, owner_id=user.id)
+        deal = Deal(
+            title="Alpha Deal", stage="prospect", probability=10, owner_id=user.id
+        )
         db.add(deal)
         db.flush()
 
-        act = Activity(type="call", title="Deal Call", deal_id=deal.id, owner_id=user.id)
+        act = Activity(
+            type="call", title="Deal Call", deal_id=deal.id, owner_id=user.id
+        )
         db.add(act)
         db.commit()
 
@@ -275,7 +283,9 @@ class TestRecentActivities:
         db.add(contact)
         db.flush()
 
-        act = Activity(type="email", title="Contact Email", contact_id=contact.id, owner_id=user.id)
+        act = Activity(
+            type="email", title="Contact Email", contact_id=contact.id, owner_id=user.id
+        )
         db.add(act)
         db.commit()
 
@@ -302,7 +312,7 @@ class TestRecentActivities:
 
     def test_rep_sees_only_own_recent_activities(self, client, db):
         tok_a = _register_login(client, _REP_A)
-        tok_b = _register_login(client, _REP_B)
+        _register_login(client, _REP_B)
         user_a = _get_user(db, _REP_A["email"])
         user_b = _get_user(db, _REP_B["email"])
         _seed_activity(db, user_a.id)

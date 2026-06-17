@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
@@ -14,14 +14,14 @@ PIPELINE_STAGES = list(STAGE_DEFAULT_PROBABILITY.keys())
 
 
 def _start_of_month() -> datetime:
-    now = datetime.now(timezone.utc)
-    return datetime(now.year, now.month, 1, tzinfo=timezone.utc)
+    now = datetime.now(UTC)
+    return datetime(now.year, now.month, 1, tzinfo=UTC)
 
 
 def kpi_stats(db: Session, current_user: User) -> dict:
     is_rep = current_user.role == "rep"
     uid = current_user.id
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     week_ago = now - timedelta(days=7)
     month_start = _start_of_month()
 

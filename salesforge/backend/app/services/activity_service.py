@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
-from sqlalchemy import func, or_
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.core.deps import require_owner_or_above
@@ -113,7 +113,7 @@ def delete_activity(db: Session, activity_id: str, current_user: User) -> None:
 
 
 def overdue_count(db: Session, current_user: User) -> int:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     query = db.query(func.count(Activity.id)).filter(
         Activity.completed == False,  # noqa: E712
         Activity.due_date < now,

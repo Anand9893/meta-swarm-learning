@@ -68,7 +68,9 @@ def get_contact(
     return ContactDetailResponse(
         **ContactResponse.model_validate(contact).model_dump(),
         deals=[LinkedDealResponse.model_validate(d) for d in contact.deals],
-        activities=[LinkedActivityResponse.model_validate(a) for a in activities_sorted],
+        activities=[
+            LinkedActivityResponse.model_validate(a) for a in activities_sorted
+        ],
     )
 
 

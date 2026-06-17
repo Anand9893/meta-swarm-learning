@@ -1,8 +1,6 @@
 """TDD tests for WU-08: Contacts Backend."""
 from __future__ import annotations
 
-import pytest
-
 CONTACTS_URL = "/api/v1/contacts"
 REGISTER_URL = "/api/v1/auth/register"
 LOGIN_URL = "/api/v1/auth/login"
@@ -128,8 +126,16 @@ class TestListContacts:
         tok_a = _register_login(client, _REP_A)
         tok_b = _register_login(client, _REP_B)
 
-        client.post(CONTACTS_URL, json=_contact_payload(first_name="Alpha"), headers=_auth(tok_a))
-        client.post(CONTACTS_URL, json=_contact_payload(first_name="Beta"), headers=_auth(tok_b))
+        client.post(
+            CONTACTS_URL,
+            json=_contact_payload(first_name="Alpha"),
+            headers=_auth(tok_a),
+        )
+        client.post(
+            CONTACTS_URL,
+            json=_contact_payload(first_name="Beta"),
+            headers=_auth(tok_b),
+        )
 
         resp = client.get(CONTACTS_URL, headers=_auth(tok_a))
         assert resp.status_code == 200
@@ -142,7 +148,11 @@ class TestListContacts:
         tok_mgr = _register_login(client, _MANAGER)
         _set_role(db, _MANAGER["email"], "manager")
 
-        client.post(CONTACTS_URL, json=_contact_payload(first_name="Alpha"), headers=_auth(tok_a))
+        client.post(
+            CONTACTS_URL,
+            json=_contact_payload(first_name="Alpha"),
+            headers=_auth(tok_a),
+        )
 
         resp = client.get(CONTACTS_URL, headers=_auth(tok_mgr))
         names = [c["first_name"] for c in resp.json()["items"]]
@@ -153,7 +163,11 @@ class TestListContacts:
         tok_admin = _register_login(client, _ADMIN)
         _set_role(db, _ADMIN["email"], "admin")
 
-        client.post(CONTACTS_URL, json=_contact_payload(first_name="Alpha"), headers=_auth(tok_a))
+        client.post(
+            CONTACTS_URL,
+            json=_contact_payload(first_name="Alpha"),
+            headers=_auth(tok_a),
+        )
 
         resp = client.get(CONTACTS_URL, headers=_auth(tok_admin))
         names = [c["first_name"] for c in resp.json()["items"]]
@@ -276,7 +290,6 @@ class TestGetContact:
 
     def test_get_contact_detail_includes_linked_deals(self, client, db):
         from app.models.deal import Deal
-        from app.models.user import User
 
         token = _register_login(client, _REP_A)
         user = _get_user(db, _REP_A["email"])
@@ -302,9 +315,9 @@ class TestGetContact:
         assert data["deals"][0]["stage"] == "prospect"
 
     def test_get_contact_detail_activities_sorted_desc(self, client, db):
-        from datetime import datetime, UTC, timedelta
+        from datetime import UTC, datetime, timedelta
+
         from app.models.activity import Activity
-        from app.models.user import User
 
         token = _register_login(client, _REP_A)
         user = _get_user(db, _REP_A["email"])

@@ -1,9 +1,6 @@
 """TDD tests for WU-14: Activities Backend."""
 from __future__ import annotations
 
-import pytest
-from datetime import datetime, timezone, timedelta
-
 ACTIVITIES_URL = "/api/v1/activities"
 REGISTER_URL = "/api/v1/auth/register"
 LOGIN_URL = "/api/v1/auth/login"
@@ -40,7 +37,9 @@ def _activity_payload(**kwargs) -> dict:
 
 
 def _create_activity(client, headers, **kwargs):
-    return client.post(ACTIVITIES_URL, json=_activity_payload(**kwargs), headers=headers)
+    return client.post(
+        ACTIVITIES_URL, json=_activity_payload(**kwargs), headers=headers
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -120,7 +119,9 @@ class TestListActivities:
         tok = _register_login(client, _REP_A)
         _create_activity(client, _auth(tok), title="Open task")
         user = db.query(User).filter(User.email == _REP_A["email"]).first()
-        done = Activity(type="task", title="Done task", completed=True, owner_id=user.id)
+        done = Activity(
+            type="task", title="Done task", completed=True, owner_id=user.id
+        )
         db.add(done)
         db.commit()
 
@@ -130,7 +131,9 @@ class TestListActivities:
 
     def test_filter_by_deal_id(self, client, db):
         tok = _register_login(client, _REP_A)
-        deal = client.post("/api/v1/deals", json={"title": "Filter Deal"}, headers=_auth(tok)).json()
+        deal = client.post(
+            "/api/v1/deals", json={"title": "Filter Deal"}, headers=_auth(tok)
+        ).json()
         _create_activity(client, _auth(tok), title="Deal Act", deal_id=deal["id"])
         _create_activity(client, _auth(tok), title="No Deal Act")
 
@@ -146,10 +149,14 @@ class TestListActivities:
             json={"first_name": "Filter", "last_name": "Contact"},
             headers=_auth(tok),
         ).json()
-        _create_activity(client, _auth(tok), title="Contact Act", contact_id=contact["id"])
+        _create_activity(
+            client, _auth(tok), title="Contact Act", contact_id=contact["id"]
+        )
         _create_activity(client, _auth(tok), title="No Contact Act")
 
-        resp = client.get(f"{ACTIVITIES_URL}?contact_id={contact['id']}", headers=_auth(tok))
+        resp = client.get(
+            f"{ACTIVITIES_URL}?contact_id={contact['id']}", headers=_auth(tok)
+        )
         items = resp.json()["items"]
         assert len(items) == 1
         assert items[0]["title"] == "Contact Act"
@@ -218,11 +225,17 @@ class TestUpdateActivity:
         tok = _register_login(client, _REP_A)
         aid = _create_activity(client, _auth(tok)).json()["id"]
 
-        client.patch(f"{ACTIVITIES_URL}/{aid}", json={"completed": True}, headers=_auth(tok))
-        resp = client.patch(f"{ACTIVITIES_URL}/{aid}", json={"completed": False}, headers=_auth(tok))
+        client.patch(
+            f"{ACTIVITIES_URL}/{aid}", json={"completed": True}, headers=_auth(tok)
+        )
+        resp = client.patch(
+            f"{ACTIVITIES_URL}/{aid}", json={"completed": False}, headers=_auth(tok)
+        )
         assert resp.json()["completed"] is False
 
-    def test_rep_cannot_update_other_reps_activity_non_completed_field(self, client, db):
+    def test_rep_cannot_update_other_reps_activity_non_completed_field(
+        self, client, db
+    ):
         tok_a = _register_login(client, _REP_A)
         tok_b = _register_login(client, _REP_B)
         aid = _create_activity(client, _auth(tok_a)).json()["id"]
